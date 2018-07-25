@@ -9,6 +9,9 @@ from sympy.core.evaluate import global_evaluate
 from sympy.utilities.iterables import sift
 
 
+op_cache = {}
+
+
 class AssocOp(Basic):
     """ Associative operations, can separate noncommutative and
     commutative parts.
@@ -35,7 +38,9 @@ class AssocOp(Basic):
         if evaluate is None:
             evaluate = global_evaluate[0]
         if not evaluate:
-            return cls._from_args(args)
+            obj = cls._from_args(args)
+            op_cache[obj] = args
+            return obj
 
         if len(args) == 0:
             return cls.identity
@@ -48,7 +53,9 @@ class AssocOp(Basic):
         obj = cls._exec_constructor_postprocessors(obj)
 
         if order_symbols is not None:
-            return Order(obj, *order_symbols)
+            obj = Order(obj, *order_symbols)
+
+        op_cache[obj] = args
         return obj
 
     @classmethod

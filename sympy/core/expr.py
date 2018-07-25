@@ -11,6 +11,12 @@ from mpmath.libmp import mpf_log, prec_to_dps
 
 from collections import defaultdict
 
+
+def expressed_order(expr):
+    from .operations import op_cache
+    return op_cache[expr]
+
+
 class Expr(Basic, EvalfMixin):
     """
     Base class for algebraic expressions.
@@ -989,6 +995,8 @@ class Expr(Basic, EvalfMixin):
         [sin(x)**2*cos(x), sin(x)**2, 1]
 
         """
+        if order is expressed_order:
+            return order(self)
         key, reverse = self._parse_order(order)
         terms, gens = self.as_terms()
 
